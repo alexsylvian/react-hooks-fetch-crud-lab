@@ -17,9 +17,44 @@ function QuestionForm(props) {
     });
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  function handleSubmit(e) {
+    e.preventDefault();
     console.log(formData);
+
+    const { answer1, answer2, answer3, answer4 } = formData;
+    const answers = [answer1, answer2, answer3, answer4];
+
+    const postData = {
+      prompt: formData.prompt,
+      answers,
+      correctIndex: parseInt(formData.correctIndex),
+    };
+
+    fetch('http://localhost:4000/questions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to add new question');
+        }
+        return response.json();
+      })
+      .then((newQuestion) => {
+        setFormData({
+          prompt: '',
+          answer1: '',
+          answer2: '',
+          answer3: '',
+          answer4: '',
+          correctIndex: 0,
+        });
+  
+        props.onAddQuestion(newQuestion);
+      })
   }
 
   return (
